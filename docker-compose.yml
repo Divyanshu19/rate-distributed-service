@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Distributed Rate Limiter — Local Development Stack
+#
+# Usage:
+#   Start:   docker compose up -d
+#   Stop:    docker compose down
+#   Logs:    docker compose logs -f redis
+#   CLI:     docker compose exec redis redis-cli
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  redis:
+    image: redis:7.2-alpine          # slim, production-close image
+    container_name: rate-limiter-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"                  # exposed to localhost so the Spring Boot app can connect
+    volumes:
+      - redis_data:/data             # persist data across container restarts
+    command: >
+      redis-server
+      --save 60 1
+      --loglevel notice
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru # evict least-recently-used keys when memory is full
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis_data:
+    driver: local
