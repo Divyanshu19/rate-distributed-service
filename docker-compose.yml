@@ -18,12 +18,14 @@ services:
       - "6379:6379"                  # exposed to localhost so the Spring Boot app can connect
     volumes:
       - redis_data:/data             # persist data across container restarts
+    # allkeys-lru: evict least-recently-used keys when memory is full.
+    # Rate limiter keys are naturally time-bound, so LRU is the correct eviction policy.
     command: >
       redis-server
       --save 60 1
       --loglevel notice
       --maxmemory 256mb
-      --maxmemory-policy allkeys-lru # evict least-recently-used keys when memory is full
+      --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
