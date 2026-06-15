@@ -1,5 +1,6 @@
 package com.ratelimiter.distributed.core.service;
 
+import com.ratelimiter.distributed.core.model.Algorithm;
 import com.ratelimiter.distributed.core.model.RateLimitResult;
 import com.ratelimiter.distributed.core.model.RateLimitRule;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SlidingWindowRateLimiter implements RateLimiterPort {
+public class SlidingWindowRateLimiter implements RateLimitStrategy {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final DefaultRedisScript<Long> slidingWindowScript;
@@ -60,6 +61,11 @@ public class SlidingWindowRateLimiter implements RateLimiterPort {
     // TTL multiplier: keep the key alive for 2× the window after the last request.
     // Prevents stale keys from lingering if a tenant goes quiet for a long time.
     private static final int TTL_MULTIPLIER = 2;
+
+    @Override
+    public Algorithm getSupportedAlgorithm() {
+        return Algorithm.SLIDING_WINDOW;
+    }
 
     /**
      * {@inheritDoc}

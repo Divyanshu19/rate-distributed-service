@@ -33,10 +33,42 @@ public class ScriptConfig {
      *
      * @return a {@link DefaultRedisScript} ready for {@code RedisTemplate.execute()}
      */
+    /**
+     * Sliding Window Lua script bean.
+     *
+     * <p>Loaded from {@code classpath:scripts/sliding_window.lua}.
+     * The script returns a {@code Long}:
+     * <ul>
+     *   <li>{@code >= 0} → allowed; value is remaining requests in window</li>
+     *   <li>{@code -1}   → rejected; window is full</li>
+     * </ul>
+     * Injected by name ({@code slidingWindowScript}) into
+     * {@link com.ratelimiter.distributed.core.service.SlidingWindowRateLimiter}.
+     */
     @Bean
     public DefaultRedisScript<Long> slidingWindowScript() {
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();
         script.setLocation(new ClassPathResource("scripts/sliding_window.lua"));
+        script.setResultType(Long.class);
+        return script;
+    }
+
+    /**
+     * Token Bucket Lua script bean.
+     *
+     * <p>Loaded from {@code classpath:scripts/token_bucket.lua}.
+     * The script returns a {@code Long}:
+     * <ul>
+     *   <li>{@code >= 0} → allowed; value is remaining whole tokens in the bucket</li>
+     *   <li>{@code -1}   → rejected; bucket has fewer than 1 token</li>
+     * </ul>
+     * Injected by name ({@code tokenBucketScript}) into
+     * {@link com.ratelimiter.distributed.core.service.TokenBucketRateLimiter}.
+     */
+    @Bean
+    public DefaultRedisScript<Long> tokenBucketScript() {
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>();
+        script.setLocation(new ClassPathResource("scripts/token_bucket.lua"));
         script.setResultType(Long.class);
         return script;
     }
