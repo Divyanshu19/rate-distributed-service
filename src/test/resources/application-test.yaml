@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Test profile — overrides application.yaml for integration tests.
+#
+# Uses H2 in-memory database instead of MySQL so tests run without Docker.
+# Redis is mocked at the service layer so no Redis instance is needed.
+# ─────────────────────────────────────────────────────────────────────────────
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop    # H2 — let Hibernate manage schema in tests
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    enabled: false             # Flyway scripts target MySQL syntax; use Hibernate ddl in tests
+
+  # Disable Redis auto-configuration for unit/slice tests that mock it
+  data:
+    redis:
+      host: localhost
+      port: 6370               # intentionally wrong port — tests mock Redis
+
+admin:
+  api-key: test-admin-key

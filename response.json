@@ -1,0 +1,1 @@
+[{"id":2,"tenantId":"tesco-orders","endpoint":"/api/checkout","maxRequests":100,"windowSizeSeconds":60,"algorithm":"SLIDING_WINDOW","createdAt":"2026-06-16T05:10:43.120Z","updatedAt":"2026-06-16T05:10:43.120Z"}]
